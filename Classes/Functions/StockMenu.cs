@@ -1,4 +1,5 @@
 ﻿using PulseStock___Inventory_Management_System.Classes.Interface;
+using Spectre.Console;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,28 +10,30 @@ namespace PulseStock___Inventory_Management_System.Classes.Functions
 {
     internal class StockMenu : StocksManagement,IMenu
     {
-        private string Prompt;
-        private string[] Options;
-        private int index;
-        private string userFile;
+       
         public StockMenu(string prompt, string[] options, string userFile) :base(userFile)
         {
             Prompt = prompt;
             Options = options;
-            index = 0;
-            this.userFile = userFile;
+            Index = 0;
+            userFile = userFile;
         }
 
         public void DisplayOptions()
         {
-            Console.WriteLine(Prompt);
+            var Header = new Table();
+            Header.Alignment(Justify.Center);
+            Header.Border = TableBorder.Square;
+            Header.AddColumn(Prompt);
+            Header.AddRow("Use Arrow up and Arrow Down or W and D keys to navigate.");
+            AnsiConsole.Write(Header);
             for (int i = 0; i < Options.Length; i++)
             {
                 string currentOption = Options[i];
-                string selector = i == index ? "> " : "  ";
+                string selector = i == Index ? "> " : "  ";
                 string option_selector = $"{selector} {currentOption}";
 
-                if (i == index)
+                if (i == Index)
                 {
                     Console.BackgroundColor = ConsoleColor.DarkBlue;//Visually pleasing
                     Console.ForegroundColor = ConsoleColor.White;
@@ -54,29 +57,29 @@ namespace PulseStock___Inventory_Management_System.Classes.Functions
                 Console.Clear();
                 Console.CursorVisible = false;
                 DisplayOptions();
-                DisplayStock(); 
+                DisplayStock();  //Dispays the stock list
                 ConsoleKeyInfo keyinfo = Console.ReadKey(true);
                 keypressed = keyinfo.Key;
 
                 if (keypressed == ConsoleKey.UpArrow || keypressed == ConsoleKey.W)
                 {
-                    index -= 1;
-                    if (index == -1)
+                    Index -= 1;
+                    if (Index == -1)
                     {
-                        index = Options.Length - 1;
+                        Index = Options.Length - 1;
                     }
                 }
 
                 else if (keypressed == ConsoleKey.DownArrow || keypressed == ConsoleKey.S)
                 {
-                    index += 1;
-                    if (index == Options.Length)
+                    Index += 1;
+                    if (Index == Options.Length)
                     {
-                        index = 0;
+                        Index = 0;
                     }
                 }
             } while (keypressed != ConsoleKey.Enter);
-            return index;
+            return (int)Index;
         }
     }
 }

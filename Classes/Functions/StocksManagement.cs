@@ -10,7 +10,7 @@ using PulseStock___Inventory_Management_System.Classes.Parent;
 
 namespace PulseStock___Inventory_Management_System.Classes.Functions
 {
-    internal class StocksManagement : Data ,IStocksManipulation
+    internal class StocksManagement : Data, IStocksManipulation
     {
         
         public StocksManagement(string userFile)
@@ -25,9 +25,9 @@ namespace PulseStock___Inventory_Management_System.Classes.Functions
 
         private void StockMenu()
         {
-            string prompt = "Inventory Manager";
+            Prompt = "        Inventory Manager";// Add search method
             string[] options = { "Add Stock", "Count Stocks", "Modify Stock", "Remove Stock", "Make a Transaction","Account Settings","Log Out"};
-            StockMenu stockMenu = new StockMenu(prompt, options,userfile);
+            StockMenu stockMenu = new StockMenu(Prompt, options, userfile);
             bool loop = true;
 
             do 
@@ -57,7 +57,7 @@ namespace PulseStock___Inventory_Management_System.Classes.Functions
         }
         public void AddStock()
         {
-            Console.CursorVisible = false;
+            Console.CursorVisible = true;
             Console.Write("Enter Product ID: ");
             string stockID = Console.ReadLine();
             Console.Write("Enter Product Name: ");
@@ -119,7 +119,8 @@ namespace PulseStock___Inventory_Management_System.Classes.Functions
 
         public void AccountSetting()
         {
-            throw new NotImplementedException();
+            AccountManager accountSettings = new AccountManager();
+            accountSettings.DeleteUser();
         }
     }
 }

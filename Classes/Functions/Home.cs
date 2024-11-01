@@ -20,7 +20,8 @@ namespace PulseStock___Inventory_Management_System.Classes.Functions
         }
         public void HomeMenu()
         {
-             Prompt = "Welcome to PulseStock - Inventory System!";
+            Prompt = "        Welcome to PulseStock - Inventory System!";
+
             string[] Options = { "Start", "About", "Exit" };
 
             Menu HomeMenu = new Menu(Prompt, Options);

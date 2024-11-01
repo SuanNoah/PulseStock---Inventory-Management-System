@@ -1,5 +1,6 @@
 ﻿using PulseStock___Inventory_Management_System.Classes.Interface;
 using PulseStock___Inventory_Management_System.Classes.Parent;
+using Spectre.Console;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
@@ -25,7 +26,12 @@ namespace PulseStock___Inventory_Management_System.Classes.Functions
 
         public void DisplayOptions()
         {
-            Console.WriteLine(Prompt);
+            var Header = new Table();
+            Header.Alignment(Justify.Center);
+            Header.Border = TableBorder.Square;
+            Header.AddColumn(Prompt);
+            Header.AddRow("Use Arrow up and Arrow Down or W and D keys to navigate.");
+            AnsiConsole.Write(Header);
             for (int i = 0; i < Options.Length; i++)
             {
                 string currentOption = Options[i];

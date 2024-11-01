@@ -13,5 +13,6 @@ namespace PulseStock___Inventory_Management_System.Classes.Interface
         public bool CheckUser(string username);
         public string InputNotNull(string prompt, bool password);
         public string ReadPassword();
+        public void DeleteUser();
     }
 }

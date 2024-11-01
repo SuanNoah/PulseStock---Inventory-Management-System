@@ -15,6 +15,7 @@ namespace PulseStock___Inventory_Management_System.Classes.Functions
         
         public AccountManager()
         {
+            //Creates the Directory/Folder for accounts and Creates a file for the account list
             filename = Path.Combine(folder, filename);
             if (!Directory.Exists(folder))
             {
@@ -33,10 +34,10 @@ namespace PulseStock___Inventory_Management_System.Classes.Functions
 
         private void RunMenu()
         {
-            string prompt = "Log in or Sign up";
+            Prompt = "        Log in or Sign up";
             string[] options = {"Log in", "Sign up", "Go Back"};
 
-            Menu accountMenu = new Menu(prompt, options);
+            Menu accountMenu = new Menu(Prompt, options);
             bool loop = true;
             do
             {
@@ -135,7 +136,7 @@ namespace PulseStock___Inventory_Management_System.Classes.Functions
             }
             return false;
         }
-        public string InputNotNull(string prompt, bool password = false)
+        public string InputNotNull(string prompt, bool password = false)//Custom Line Reader to determine if user input is not null
         {
             string? input;
             do
@@ -160,12 +161,14 @@ namespace PulseStock___Inventory_Management_System.Classes.Functions
                 keyinfo = Console.ReadKey(true);
                 if (keyinfo.Key != ConsoleKey.Backspace && keyinfo.Key != ConsoleKey.Enter)
                 {
+                    //Changing the input to asterisk
                     password += keyinfo.KeyChar;
                     Console.Write("*");
 
                 }
                 else if (keyinfo.Key == ConsoleKey.Backspace && password.Length > 0)
                 {
+                    //Erases the input
                     password = password.Substring(0, password.Length - 1);
                     Console.Write("\b \b");
                 }
@@ -173,10 +176,14 @@ namespace PulseStock___Inventory_Management_System.Classes.Functions
             return password;
         }
 
-        private void goBack()
+        private void goBack() //go back to main menu/home
         {
             Console.WriteLine("You are now going back to the main menu. Press any key to continue.");
             Console.ReadKey();
+        }
+        public void DeleteUser() //Deletes the user
+        {
+            throw new NotImplementedException();
         }
 
     }
