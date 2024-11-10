@@ -23,35 +23,32 @@ namespace PulseStock___Inventory_Management_System.Classes.Functions
             Options = options;
             Index = 0;
         }
-
         public void DisplayOptions()
         {
-            var Header = new Table();
-            Header.Alignment(Justify.Center);
-            Header.Border = TableBorder.Square;
-            Header.AddColumn(Prompt);
-            Header.AddRow("Use Arrow up and Arrow Down or W and D keys to navigate.");
-            AnsiConsole.Write(Header);
+            /* using the spectre console the program will display the options inside a panel
+             and a table for the header and prompt that tells the user to navigate the options using 
+            arrow keys or ws key
+             */
+            var header = new Table();
+            header.Expand();
+            header.AddColumn(new TableColumn(Prompt).Centered());
+            header.AddRow("Use Arrow up and Arrow Down or W and D keys to navigate.");
+            header.Alignment(Justify.Center);
+            var panelContent = new List<string>(); 
             for (int i = 0; i < Options.Length; i++)
-            {
-                string currentOption = Options[i];
-                string selector = i == Index ? "> " : "  ";
-                string option_selector = $"{selector} {currentOption}";
-
-                if (i == Index)
-                {
-                    Console.BackgroundColor = ConsoleColor.DarkBlue;//Visually pleasing
-                    Console.ForegroundColor = ConsoleColor.White;
-                    Console.Write(option_selector);
-                    Console.ResetColor();
-                    Console.WriteLine();
-                }
-                else
-                {
-                    Console.WriteLine(option_selector);
-                }
+            { 
+                string currentOption = Options[i]; 
+                string selector = i == Index ? "[bold yellow]>[/]" : " "; 
+                string option_selector = $"{selector}{currentOption}"; 
+                panelContent.Add(option_selector);
             }
-            Console.ResetColor();
+            var panel = new Panel(string.Join("\n", panelContent));
+            panel.Padding = new Padding(3, 3);
+            panel.Header = new PanelHeader("Options");
+            panel.Border = BoxBorder.Rounded;
+            panel = panel.BorderColor(Color.White);
+            AnsiConsole.Write(header);
+            AnsiConsole.Write(panel); 
         }
 
         public int Run()

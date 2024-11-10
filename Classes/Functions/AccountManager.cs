@@ -2,6 +2,7 @@
 using PulseStock___Inventory_Management_System.Classes.Parent;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection.Metadata.Ecma335;
 using System.Text;
@@ -34,8 +35,8 @@ namespace PulseStock___Inventory_Management_System.Classes.Functions
 
         private void RunMenu()
         {
-            Prompt = "        Log in or Sign up";
-            string[] options = {"Log in", "Sign up", "Go Back"};
+            Prompt = "Log in or Sign up";
+            string[] options = {" Log in", " Sign up", " Go Back"};
 
             Menu accountMenu = new Menu(Prompt, options);
             bool loop = true;
@@ -50,12 +51,12 @@ namespace PulseStock___Inventory_Management_System.Classes.Functions
 
                     case 1:
                         CreateUser();
-                        break;
+                    break;
 
                     case 2:
                         goBack();
                         loop = false;
-                        break;
+                    break;
                 }
             }while (loop);
         }
@@ -84,7 +85,7 @@ namespace PulseStock___Inventory_Management_System.Classes.Functions
             string userFile = Path.Combine(userDirectory, input[0] + "_StockList");
             using (StreamWriter writeHeader = File.AppendText(userFile))
             {
-                writeHeader.WriteLine("Stock ID,Product Name,Price,Date MFG,Date EXP");//Writes the header for stock details
+                writeHeader.WriteLine("Product ID,Product Name,Price,Date MFG,Date EXP");//Writes the header for stock details
             }
             Console.Write($"\nAccount for {input[0]} has been created successfuly. Press any key to continue.");
             Console.ReadKey();
@@ -115,7 +116,7 @@ namespace PulseStock___Inventory_Management_System.Classes.Functions
                     //After loggin in the program should open the specified user directory and then open the specified stocks list for the user
                     string userDirectory = Path.Combine (folder, Username);
                     string userFile = Path.Combine(userDirectory, Username + "_StockList");
-                    StocksManagement manage = new StocksManagement(userFile);
+                    StocksManagement manage = new StocksManagement(userFile,Username);
                     manage.StocksStart();
                     return;
                 }
@@ -180,10 +181,6 @@ namespace PulseStock___Inventory_Management_System.Classes.Functions
         {
             Console.WriteLine("You are now going back to the main menu. Press any key to continue.");
             Console.ReadKey();
-        }
-        public void DeleteUser() //Deletes the user
-        {
-            throw new NotImplementedException();
         }
 
     }

@@ -17,6 +17,7 @@ namespace PulseStock___Inventory_Management_System.Classes.Parent
         public string? Password = "Empty";
         public string[] input = new string[2];
         public string userfile = "";
+        public bool status;
 
     }
 }

@@ -1,4 +1,5 @@
 ﻿using PulseStock___Inventory_Management_System.Classes.Functions;
+using Spectre.Console;
 namespace PulseStock___Inventory_Management_System.App
 {
     internal class Program
