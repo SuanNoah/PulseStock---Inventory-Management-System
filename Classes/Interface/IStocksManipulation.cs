@@ -12,8 +12,9 @@ namespace PulseStock___Inventory_Management_System.Classes.Interface
         public void AddStock();
         public void RemoveStock();
         public void ModifyStock();
-        public void CountStock();
-        public void Transaction();
+        public void MakeTransaction();
+        public void ViewTransactons();
+        public void ViewAnalytics();
         public void AccountSetting();
         public void DeleteUser(string dir, string userFile, string username);
         public void SearchProduct();

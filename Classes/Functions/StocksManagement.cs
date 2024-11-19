@@ -8,20 +8,22 @@ using System.Threading.Tasks;
 using Spectre.Console;
 using PulseStock___Inventory_Management_System.Classes.Parent;
 using System.Xml.Linq;
+using System.Net.Http.Headers;
 
 namespace PulseStock___Inventory_Management_System.Classes.Functions
 {
     internal class StocksManagement : Data, IStocksManipulation
     {
-        public StocksManagement(string userFile, string username)
+        public StocksManagement(string userstock, string usersales,string username)
         {
-            userfile = userFile;
+            userStockList = userstock;
+            userSales = usersales;
             Username = username;
         }
 
-        public StocksManagement(string userFile)
+        public StocksManagement(string userstock)
         {
-            userfile = userFile;
+            userStockList = userstock;
         }
         public void StocksStart()
         {
@@ -32,9 +34,9 @@ namespace PulseStock___Inventory_Management_System.Classes.Functions
         private void StockMenu()
         {
             Prompt = "Inventory Manager";
-            string[] options = { " Add Product", " View Product List", " View Product Quantity", " Search for Product", " Modify Product",
-                                " Remove Product", " Make a Transaction"," Delete Account"," Log Out"};
-            StockMenu stockMenu = new StockMenu(Prompt, options, userfile);
+            string[] options = { " Add Product", " View Product List", " Search for Product", " Modify Product",
+                                " Remove Product", " Transaction and Analytics"," Delete Account"," Log Out"};
+            StockMenu stockMenu = new StockMenu(Prompt, options, userStockList);
             bool loop = true;
             
             do 
@@ -47,27 +49,22 @@ namespace PulseStock___Inventory_Management_System.Classes.Functions
                         AddStock();
                         break;
                     case 1:
-                        Console.Clear();
                         DisplayStock();
-                        Console.Write("Nothing Follows. Press any key to exit.");
                         Console.ReadKey();
                         break;
                     case 2:
-                        Console.Clear();
-                        CountStock();
-                        break;
-                    case 3:
                         SearchProduct();
                         break;
-                    case 4:
+                    case 3:
                         ModifyStock();
                         break;
-                    case 5:
+                    case 4:
                         RemoveStock();
                         break;
-                    case 6:
+                    case 5:
+                        Transaction();
                         break;
-                    case 7:
+                    case 6:
                         AccountSetting();
                         if (status == true) 
                         {
@@ -75,7 +72,7 @@ namespace PulseStock___Inventory_Management_System.Classes.Functions
                             break;
                         }
                         break;
-                    case 8:
+                    case 7:
                         loop = false;
                         break;
                 }
@@ -90,6 +87,8 @@ namespace PulseStock___Inventory_Management_System.Classes.Functions
             string stockName = Console.ReadLine();
             Console.Write("Enter Product Price: ");
             string stockPrice = Console.ReadLine();
+            Console.Write("Enter Product Quantity: ");
+            string stockQTY = Console.ReadLine();
             Console.Write("Enter Product MFG Date(DD/MM/YYYY): ");
             string stockMFG = Console.ReadLine();
             Console.Write("Enter Product EXP Date(DD/MM/YYYY): ");
@@ -101,9 +100,9 @@ namespace PulseStock___Inventory_Management_System.Classes.Functions
                 Console.ReadKey();
                 return;
             }
-            using (StreamWriter stockWrite = File.AppendText(userfile)) 
+            using (StreamWriter stockWrite = File.AppendText(userStockList)) 
             {
-                stockWrite.WriteLine($"{stockID},{stockName},{stockPrice},{stockMFG},{stockEXP}");
+                stockWrite.WriteLine($"{stockID},{stockName},{stockPrice},{stockQTY},{stockMFG},{stockEXP}");
             }
             Console.Write($"{stockID} {stockName} - succesfully added to the database.");
             Console.ReadKey();
@@ -111,28 +110,38 @@ namespace PulseStock___Inventory_Management_System.Classes.Functions
 
         public void DisplayStock()
         {
+            Console.Clear();
             Console.WriteLine();
-            string[] lines = File.ReadAllLines(userfile);
+            string[] lines = File.ReadAllLines(userStockList);
+            string[] check = lines.Skip(1).ToArray();
             string[] headers = lines[0].Split(',');
+            if (check.Length == 0) 
+            {
+                Console.Write("File is empty, try adding products. Press any key to return.");
+                Console.ReadKey();
+                return;
+            }
             var table = new Table(); //using the spectre console we are creating a table for GUI
             table.Border = TableBorder.Square;
             table.ShowRowSeparators = true;
             table.Alignment(Justify.Center);
             foreach (string header in headers) //Add built in header for the table
             {
-                table.AddColumn($"[green]{header}[/]");
+                table.AddColumn($"[Bold Yellow]{header}[/]");
             }
             foreach (string row in lines.Skip(1)) //Skipping the first line so that the program can add the stock details 
             {
                 string[] fields = row.Split(',');
-                table.AddRow($"{fields[0]}", $"{fields[1]}", $"{fields[2]}", $"{fields[3]}", $"{fields[4]}");
+                table.AddRow($"{fields[0]}", $"{fields[1]}", $"{fields[2]}", $"{fields[3]}", $"{fields[4]}", $"{fields[5]}");
             }
             AnsiConsole.Write(table);
+            Console.Write("Nothing Follows. Press any key to exit.");
         }
 
         public void ModifyStock()
         {
             Console.Clear();
+            Console.CursorVisible = true;
             Table header = new Table();
             header.Border = TableBorder.Square;
             header.Expand();
@@ -140,14 +149,14 @@ namespace PulseStock___Inventory_Management_System.Classes.Functions
             header.AddRow("Please put the Product ID of the product that you want to modify.").Centered();
             AnsiConsole.Write(header);
             DisplayStock();
-            Console.ReadKey();
-
+            Console.ReadKey(true);
             Console.Clear();
+
             AnsiConsole.Write(header);
             Console.Write("Enter the Product ID: ");
             string productId  = Console.ReadLine()?.Trim();
 
-            List<string> read = File.ReadAllLines(userfile).ToList();
+            List<string> read = File.ReadAllLines(userStockList).ToList();
             var productREAD = read.FirstOrDefault(read => read.StartsWith(productId + ","));
 
             if (productREAD == null)
@@ -159,8 +168,8 @@ namespace PulseStock___Inventory_Management_System.Classes.Functions
             //If successful then split the details of the product
             string[] split = productREAD.Split(',');
             Prompt = "[Bold Yellow]Modify Product Details[/]";
-            string[] options = { $" Product ID: {split[0]}", $" Product Name: {split[1]}", $" Price: {split[2]}", $" Product MFG: {split[3]}", $" Product EXP: {split[4]}", " Cancel"};
-            StockMenu stockMenu = new StockMenu(Prompt, options, userfile);
+            string[] options = { $" Product ID: {split[0]}", $" Product Name: {split[1]}", $" Price: {split[2]}", $" QTY: {split[3]}", $" Product MFG: {split[4]}", $" Product EXP: {split[5]}", " Cancel"};
+            StockMenu stockMenu = new StockMenu(Prompt, options, userStockList);
             bool loop = true;
             do 
             {
@@ -168,6 +177,7 @@ namespace PulseStock___Inventory_Management_System.Classes.Functions
                 switch (index) 
                 {
                     case 0:
+                    Console.CursorVisible = true;
                     Console.Write("Enter new Product ID: ");
                     split[0] = Console.ReadLine()?.Trim();
                     if (string.IsNullOrEmpty(split[0]))
@@ -180,6 +190,7 @@ namespace PulseStock___Inventory_Management_System.Classes.Functions
                     break;
 
                     case 1:
+                    Console.CursorVisible = true;
                     Console.Write("Enter new Product Name: ");
                     split[1] = Console.ReadLine()?.Trim();
                     if (string.IsNullOrEmpty(split[1]))
@@ -192,6 +203,7 @@ namespace PulseStock___Inventory_Management_System.Classes.Functions
                     break;
 
                     case 2:
+                    Console.CursorVisible = true;
                     Console.Write("Enter new Product Price: ");
                     split[2] = Console.ReadLine()?.Trim();
                     if (string.IsNullOrEmpty(split[2]))
@@ -204,7 +216,8 @@ namespace PulseStock___Inventory_Management_System.Classes.Functions
                     break;
 
                     case 3:
-                    Console.Write("Enter new Product MFG Date(DD/MM/YYYY): ");
+                    Console.CursorVisible = true;
+                    Console.Write("Enter new Product Quantity: ");
                     split[3] = Console.ReadLine()?.Trim();
                     if (string.IsNullOrEmpty(split[3]))
                     {
@@ -216,6 +229,7 @@ namespace PulseStock___Inventory_Management_System.Classes.Functions
                     break;
 
                     case 4:
+                    Console.CursorVisible = true;
                     Console.Write("Enter new Product EXP Date(DD/MM/YYYY): ");
                     split[4] = Console.ReadLine()?.Trim();
                     if (string.IsNullOrEmpty(split[4]))
@@ -228,13 +242,25 @@ namespace PulseStock___Inventory_Management_System.Classes.Functions
                     break;
 
                     case 5:
-                    Console.Write("Modification canceled. Press any key to continue...");
-                    Console.ReadKey();
+                    Console.CursorVisible = true;
+                    Console.Write("Enter new Product EXP Date(DD/MM/YYYY): ");
+                    split[5] = Console.ReadLine()?.Trim();
+                    if (string.IsNullOrEmpty(split[4]))
+                    {
+                        Console.WriteLine("The input must not be empty. Please any key to return.");
+                        Console.ReadLine();
+                        return;
+                    }
                     loop = false;
                     break;
+
+                    case 6:
+                    Console.Write("Modification canceled. Press any key to continue...");
+                    Console.ReadKey();
+                    return;
                 }
             }while (loop);
-
+            Console.CursorVisible = true;
             Console.Write("Are you sure you want change the product details?(yes/no): ");
             string choice = Console.ReadLine()?.Trim().ToLower();
             if (choice != "yes")
@@ -246,18 +272,20 @@ namespace PulseStock___Inventory_Management_System.Classes.Functions
             string updateDetail = string.Join(',', split);
             int location = read.IndexOf(productREAD);
             read[location] = updateDetail;
-            File.WriteAllLines(userfile, read);
+            File.WriteAllLines(userStockList, read);
+            Console.CursorVisible = false;
             Console.WriteLine("Product details updated successfully. Press any key to continue...");
             Console.ReadKey();
         }
 
         public void RemoveStock()
         {
+            Console.Clear();
             Prompt = "Remove Product";
             string[] options = { " Stock ID", " Product Name", " Exit"};
-            StockMenu removeProduct = new StockMenu(Prompt, options, userfile);
+            StockMenu removeProduct = new StockMenu(Prompt, options, userStockList);
             //Make a list to manipulate the contents of the userFile
-            List<string> lines = File.ReadAllLines (userfile).ToList();
+            List<string> lines = File.ReadAllLines (userStockList).ToList();
             //Store the ID or Product name so that the list can compare it to the userFile
             string search;
             bool loop = false;
@@ -282,6 +310,13 @@ namespace PulseStock___Inventory_Management_System.Classes.Functions
                         AnsiConsole.Write(header);
                         Console.Write("Enter Product ID: ");
                         search = Console.ReadLine();
+                        if (string.IsNullOrEmpty(search)) 
+                        {
+                            Console.Write("The input cannot be empty. Please enter any key to continue.");
+                            Console.ReadKey();
+                            return;
+                        }
+
                         //Comparing the lines to 0 so that the program can confirm the return value of RemoveAll and if succesfully removed the boolean loop will be true
                         loop = (lines.RemoveAll(line => line.StartsWith(search + ','))) > 0;
                         break;
@@ -300,9 +335,21 @@ namespace PulseStock___Inventory_Management_System.Classes.Functions
                         AnsiConsole.Write(header2);
                         Console.Write("Enter Product Name: ");
                         search = Console.ReadLine();
+                        if (string.IsNullOrEmpty(search)) 
+                        {
+                            Console.Write("The input cannot be empty. Please enter any key to continue.");
+                            Console.ReadKey();
+                            return;
+                        }
                         DisplayStock();
                         Console.Write($"Are you sure you want to delete {search}?(yes/no)");
                         confirmation = Console.ReadLine().Trim().ToLower();
+                        if (string.IsNullOrEmpty(search)) 
+                        {
+                            Console.Write("The input cannot be empty. Please enter any key to continue.");
+                            Console.ReadKey();
+                            return;
+                        }
                         if (confirmation != "yes")
                         {
                             Console.WriteLine("Product deleting cancelled. Press any key to Continue.");
@@ -321,7 +368,7 @@ namespace PulseStock___Inventory_Management_System.Classes.Functions
                 //Updating the file, transferring the list to the text file
                 if (loop)
                 {
-                    File.WriteAllLines(userfile, lines);
+                    File.WriteAllLines(userStockList, lines);
                     Console.Clear();
                     DisplayStock();
                     Console.CursorVisible = false;
@@ -336,50 +383,217 @@ namespace PulseStock___Inventory_Management_System.Classes.Functions
         }
 
 
-        public void Transaction()
+        private void Transaction()
         {
-            throw new NotImplementedException();
-        }
-        public void CountStock()
-        {
-            string[] lines = File.ReadAllLines(userfile); 
-           // Create the stock counting table
-             var stockTable = new Table() 
-            { 
-                 Border = TableBorder.Square, 
-                 ShowRowSeparators = true, 
-                 Alignment = Justify.Center
-             }; 
-            // Add headers to the table
-            stockTable.AddColumn(new TableColumn("[Green][bold]QTY[/][/]").Centered()); 
-            stockTable.AddColumn(new TableColumn("[Green][bold]Product Name[/][/]").Centered()); 
-            stockTable.AddColumn(new TableColumn("[Green][bold]Price[/][/]").Centered()); 
-            // Use a dictionary to count quantities 
-            var stockCounts = new Dictionary<string, (int quantity, string price)>(); 
-            foreach (string row in lines.Skip(1)) 
+            Console.Clear();
+            Prompt = "Transactions and Analytics";
+            string[] options = { " Make a Transaction", " View Transaction History", " View Analytics", " Exit"};
+            StockMenu transMenu = new StockMenu(Prompt,options,userSales);
+            bool loop = true;
+
+            do 
             {
-                string[] fields = row.Split(',');
-                string productName = fields[1]; 
-                string price = fields[2]; 
-                if (stockCounts.ContainsKey(productName))
+                int index = transMenu.Run();
+                switch (index) 
                 {
-                    stockCounts[productName] = (stockCounts[productName].quantity + 1, price);
-                } 
-                else
-                { 
-                    stockCounts[productName] = (1,price); 
+                    case 0:
+                        MakeTransaction();
+                        break;
+                    case 1:
+                        ViewTransactons();
+                        break;
+                    case 2:
+                        ViewAnalytics();
+                        break;
+                    case 3:
+                        loop = false;
+                        break;
                 }
-            } // Add rows to the table 
-            foreach (var item in stockCounts) 
+            }while(loop);
+        }
+
+        public void MakeTransaction()
+        { 
+            Console.Clear();
+
+            string[] stockList = File.ReadAllLines(userStockList);
+            List<string[]> products = new List<string[]>();
+            int productCount = 1;
+            var table = new Table 
+            {
+                Border = TableBorder.Square,
+                ShowRowSeparators = true, 
+                Alignment = Justify.Center 
+            }; 
+            table.Title = new TableTitle("[Bold Yellow]Available Products:[/]"); 
+            table.AddColumn("No.");
+            table.AddColumn("Product Name"); 
+            table.AddColumn("Price"); 
+            table.AddColumn("Quantity"); 
+            foreach (string line in stockList.Skip(1)) 
+            {
+                string[] parts = line.Split(',');
+                parts[0] = productCount.ToString();
+                products.Add(parts);
+                table.AddRow(productCount.ToString(), parts[1], parts[2], parts[3]);
+                productCount++;
+            }
+            AnsiConsole.Write(table);
+
+            List<string[]> transaction = new List<string[]>();
+            bool addproducts = true;
+            do
+            {
+                Console.CursorVisible = true;
+                Console.Write("\nEnter the product number to add to the transaction (type \"done\" to proceed or \"exit\" cancel): ");
+                string input = Console.ReadLine().Trim().ToLower();
+                if (input == "done")
+                {
+                    addproducts = false;
+                }
+                if (input == "exit")
+                {
+                    return;
+                }
+                else if (int.TryParse(input, out int ProductId) && ProductId > 0 && ProductId <= products.Count)
+                {
+                    var product = products[ProductId - 1];
+                    Console.Write("Enter Quantity: ");
+                    if (int.TryParse(Console.ReadLine(), out int quantity) && quantity <= int.Parse(product[3]))
+                    {
+                        product[3] = (int.Parse(product[3]) - quantity).ToString();
+                        var transactionProduct = transaction.Find(p => p[0] == ProductId.ToString());
+                        if (transactionProduct == null)
+                        {
+                            transaction.Add(new string[] { ProductId.ToString(), product[1], product[2], quantity.ToString() });
+                        }
+                        else
+                        {
+                            transactionProduct[3] = (int.Parse(transactionProduct[3]) + quantity).ToString();
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("Invalid quantity. Please try again.");
+                    }
+                }
+
+            } while (addproducts);
+            double money = 0;
+            double total = 0;
+            double change = 0;
+            bool validCash = false;
+            foreach (var product in transaction) 
+            {
+                total += double.Parse(product[2]) * int.Parse(product[3]); 
+            }
+            Console.WriteLine($"Total Sales : {total}");
+            while (!validCash) 
+            {
+                Console.Write("Enter cash amount: ");
+                if (double.TryParse(Console.ReadLine(), out money) && money >= total)
+                {
+                    validCash = true;
+                }
+                else 
+                {
+                    Console.WriteLine("Invalid cash amount. Please enter an amount equal to or greater than the total.");
+                }
+            }
+            change = money - total;
+            Console.Clear(); 
+            table = new Table 
+            {
+                Border = TableBorder.Square,
+                ShowRowSeparators = true, 
+                Alignment = Justify.Center 
+            };
+            table.Title = new TableTitle("[Bold Yellow]R&G Soy Food Products[/]");
+            table.AddColumn("Product Name"); 
+            table.AddColumn("Price"); 
+            table.AddColumn("Quantity"); 
+            foreach (var product in transaction) 
             { 
-                stockTable.AddRow(item.Value.quantity.ToString(), item.Key, item.Value.price);
-            } // Render the stock counting table
-            AnsiConsole.Write(stockTable);
-            Console.Write("Nothing Follows. Press any key to exit.");
+                table.AddRow(product[1], product[2], product[3]); 
+                
+            } 
+            table.AddRow(new Markup("[bold red]Total[/]"), new Markup($"[bold red]PHP {total}[/]"));
+            table.AddRow(new Markup("[bold blue]Cash[/]"), new Markup($"[bold blue]PHP {money:0.00}[/]"));
+            table.AddRow(new Markup("[bold green]Change[/]"), new Markup($"[bold green]PHP {change:0.00}[/]"));
+            table.AddRow(new Markup($"Date Purchased: [Bold Yellow]{DateTime.Now}[/]"), new Markup(""));
+            table.AddRow(new Markup("[Bold Yellow]This is your SALES INVOICE[/]"));
+            AnsiConsole.Write(table); 
+            // Save the transaction 
+            string transactionRecord = $"{DateTime.Now},{string.Join('|', transaction.Select(p => $"{p[0]},{p[1]},{p[2]},{p[3]}"))},{total},{money},{change}"; 
+            File.AppendAllText(userSales, transactionRecord + Environment.NewLine); 
+            // Update stock list with new quantities
+            List<string> updatedStockList = new List<string>
+            { 
+                stockList[0] // Keep header
+            }; 
+            foreach (var product in products) 
+            {
+                if (int.Parse(product[3]) > 0) {
+                    updatedStockList.Add($"{product[0]},{product[1]},{product[2]},{product[3]},{product[4]},{product[5]}");
+                }
+            } 
+            File.WriteAllLines(userStockList, updatedStockList);
+            Console.CursorVisible = false;
+            Console.WriteLine("Transaction completed. Press any key to return to the menu.");
             Console.ReadKey();
         }
-        
+        public void ViewTransactons() 
+        {
+             Console.Clear();
+            string[] transactionRecords = File.ReadAllLines(userSales);
 
+            // Check if the userSales file exists
+            if (!File.Exists(userSales) || transactionRecords.Length == 0)
+            {
+                Console.WriteLine("No transactions found.");
+                Console.WriteLine("Press any key to return to the menu.");
+                Console.ReadKey();
+                return;
+            }
+
+            // Read the transaction records
+
+            // Display transactions in a table
+            var table = new Table
+            {
+                Border = TableBorder.Square,
+                ShowRowSeparators = true,
+                Alignment = Justify.Center
+            };
+            table.Title = new TableTitle("[Bold Yellow]Transaction History[/]");
+            table.AddColumn("Date");
+            table.AddColumn("Products");
+            table.AddColumn("Total");
+            table.AddColumn("Cash");
+            table.AddColumn("Change");
+
+            foreach (string record in transactionRecords)
+            {
+                string[] parts = record.Split(',');
+
+                string date = parts[0];
+                string products = parts[2].Replace('|', '\n'); // Display each product on a new line
+                string total = parts[parts.Length - 3];
+                string cash = parts[parts.Length - 2];
+                string change = parts[parts.Length - 1];
+
+                table.AddRow(date, products, total, cash, change);
+            }
+
+            AnsiConsole.Write(table);
+
+            Console.WriteLine("Press any key to return to the menu.");
+            Console.ReadKey();
+        }
+        public void ViewAnalytics() 
+        {
+        
+        }
         public void AccountSetting()
         {
             DeleteUser(folder, filename, Username);
@@ -469,7 +683,7 @@ namespace PulseStock___Inventory_Management_System.Classes.Functions
                 return;
             }
 
-            string[] read = File.ReadAllLines(userfile);
+            string[] read = File.ReadAllLines(userStockList);
             var result = new List<string>();
 
             foreach (string word in read.Skip(1))

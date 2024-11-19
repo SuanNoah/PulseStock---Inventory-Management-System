@@ -3,6 +3,7 @@ using Spectre.Console;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -16,7 +17,7 @@ namespace PulseStock___Inventory_Management_System.Classes.Functions
             Prompt = prompt;
             Options = options;
             Index = 0;
-            userfile = userFile;
+            userStockList = userFile;
         }
 
         public void DisplayOptions()

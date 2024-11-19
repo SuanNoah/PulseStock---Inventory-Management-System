@@ -1,12 +1,12 @@
 ﻿using PulseStock___Inventory_Management_System.Classes.Interface;
 using PulseStock___Inventory_Management_System.Classes.Parent;
+using Spectre.Console;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
-
 namespace PulseStock___Inventory_Management_System.Classes.Functions
 {
     internal class Home : Data, IHomeMethods
@@ -60,12 +60,23 @@ namespace PulseStock___Inventory_Management_System.Classes.Functions
         }
         public void About()
         {
-            Console.WriteLine("");
+            Console.Clear();
+            Table about = new Table();
+            about.Expand();
+            about.AddColumn(new TableColumn(Messages.Messages.aboutMSG).Centered());
+            AnsiConsole.Write(about);
+            Console.Write("Press any key to return to home.");
+            Console.ReadKey();
         }
 
         public void Exit()
         {
-            Console.WriteLine("Thanks for using");
+            Console.Clear();
+            Table about = new Table();
+            about.Expand();
+            about.AddColumn(new TableColumn(Messages.Messages.exitMSG).Centered());
+            AnsiConsole.Write(about);
+            Environment.Exit(0);
         }
 
 

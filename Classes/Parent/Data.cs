@@ -11,12 +11,14 @@ namespace PulseStock___Inventory_Management_System.Classes.Parent
         public string? Prompt { get; set; }
         public string[]? Options { get; set; }
         public int? Index { get; set; }
-        public string folder = "Accounts";
-        public string filename = "list_of_accounts.txt";
-        public string? Username = "Empty";
-        public string? Password = "Empty";
+        public const string folder = "Accounts";
+        public const string filename = "list_of_accounts.txt";
+        public string accountListLocation;
+        public string? Username;
+        public string? Password;
         public string[] input = new string[2];
-        public string userfile = "";
+        public string userStockList;
+        public string userSales;
         public bool status;
 
     }

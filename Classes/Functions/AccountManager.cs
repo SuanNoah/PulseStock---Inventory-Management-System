@@ -8,7 +8,7 @@ using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
 using System.Transactions;
-
+//
 namespace PulseStock___Inventory_Management_System.Classes.Functions
 {
     internal class AccountManager : Data, IAccountManipulation
@@ -17,14 +17,14 @@ namespace PulseStock___Inventory_Management_System.Classes.Functions
         public AccountManager()
         {
             //Creates the Directory/Folder for accounts and Creates a file for the account list
-            filename = Path.Combine(folder, filename);
+            accountListLocation = Path.Combine(folder, filename);
             if (!Directory.Exists(folder))
             {
                 Directory.CreateDirectory(folder);
             }
-            if (!File.Exists(filename))
+            if (!File.Exists(accountListLocation))
             {
-                using (File.Create(filename)) { }
+                using (File.Create(accountListLocation));
             }
         }
         public void AccountStart()
@@ -63,10 +63,24 @@ namespace PulseStock___Inventory_Management_System.Classes.Functions
         public void CreateUser()
         {
             Console.CursorVisible = true;
-            input[0] = InputNotNull("\nEnter username: ");
-            if (input[0] == "error") { return; }
-            input[1] = InputNotNull("Enter password: ", true);
-            if (input[1] == "error") { return; }//The returned string will be used to break the input and return to the menu safely
+            Console.Write("\nEnter username: ");
+            input[0] = Console.ReadLine();
+            if (string.IsNullOrEmpty(input[0]))
+            {
+                Console.CursorVisible= false;
+                Console.Write("Input must not be empty. Press any key to continue.");
+                Console.ReadKey();
+                return; 
+            }
+            Console.Write("Enter password: ");
+            input[1] = ReadPassword();
+            if (string.IsNullOrEmpty(input[1]))
+            {
+                Console.CursorVisible= false;
+                Console.Write("Input must not be empty. Press any key to continue.");
+                Console.ReadKey();
+                return;
+            }//The returned string will be used to break the input and return to the menu safely
 
             if (CheckUser(input[0]))
             {
@@ -75,17 +89,22 @@ namespace PulseStock___Inventory_Management_System.Classes.Functions
                 return;
             }
             //Writing input[0] as the username and input[1] as password while being separated using comma(,)
-            using (StreamWriter writeuser = File.AppendText(filename))
+            using (StreamWriter writeuser = File.AppendText(accountListLocation))
             {
                 writeuser.WriteLine(input[0] + "," + input[1]);
             }
-            //creates a directory and a file specified for the user, it will be in located at Debug/net8.0/Accounts/Username/Username_StockList
+            //creates a directory and a file specified for the user, it will be in located at Debug/net8.0/Accounts/Username/Username_StockList or Saleslist
             string userDirectory = Path.Combine(folder, input[0]);
             Directory.CreateDirectory(userDirectory);
-            string userFile = Path.Combine(userDirectory, input[0] + "_StockList");
-            using (StreamWriter writeHeader = File.AppendText(userFile))
+            string userStocklist = Path.Combine(userDirectory, input[0] + "_StockList");
+            string usersales = Path.Combine(userDirectory, input[0] + "_Sales");
+            using (StreamWriter writeHeader = File.AppendText(userStocklist))
             {
-                writeHeader.WriteLine("Product ID,Product Name,Price,Date MFG,Date EXP");//Writes the header for stock details
+                writeHeader.WriteLine("Product ID,Product Name,Price,QTY,Date MFG,Date EXP");//Writes the header for stock details
+            }
+            if (!File.Exists(userSales))//Creates File for sales to be used later
+            {
+                using (File.Create(usersales));
             }
             Console.Write($"\nAccount for {input[0]} has been created successfuly. Press any key to continue.");
             Console.ReadKey();
@@ -93,7 +112,7 @@ namespace PulseStock___Inventory_Management_System.Classes.Functions
         }
         public void LogIn()
         {
-            string[] lines = File.ReadAllLines(filename);
+            string[] lines = File.ReadAllLines(accountListLocation);
             Console.CursorVisible = true;
             if (lines.Length == 0)//Checks if file has accounts
             {
@@ -101,10 +120,25 @@ namespace PulseStock___Inventory_Management_System.Classes.Functions
                 Console.ReadKey();
                 return;
             }
-            Username = InputNotNull("\nEnter username: ");
-            if (Username == "error") { return; }
-            Password = InputNotNull("Enter password: ", true);
-            if( Password == "error") { return; }//The returned string will be used to break the input and return to the menu safely
+            Console.Write("\nEnter username: ");
+            Username = Console.ReadLine();
+            if (string.IsNullOrEmpty(Username)) 
+            {
+                Console.CursorVisible= false;
+                Console.Write("Input must not be empty. Press any key to continue.");
+                Console.ReadKey();
+                return;
+            }
+
+            Console.Write("Enter password: ");
+            Password = ReadPassword();
+            if( string.IsNullOrEmpty(Password))//The returned string will be used to break the input and return to the menu safely 
+            { 
+                Console.CursorVisible= false;
+                Console.Write("Input must not be empty. Press any key to continue.");
+                Console.ReadKey();
+                return;
+            }
 
             for (int i = 0; i < lines.Length; i++)
             {
@@ -115,8 +149,9 @@ namespace PulseStock___Inventory_Management_System.Classes.Functions
                     Console.ReadKey();
                     //After loggin in the program should open the specified user directory and then open the specified stocks list for the user
                     string userDirectory = Path.Combine (folder, Username);
-                    string userFile = Path.Combine(userDirectory, Username + "_StockList");
-                    StocksManagement manage = new StocksManagement(userFile,Username);
+                    string userstocklist = Path.Combine(userDirectory, Username + "_StockList");
+                    userSales = Path.Combine(userDirectory, Username + "_Sales");
+                    StocksManagement manage = new StocksManagement(userstocklist,userSales,Username);
                     manage.StocksStart();
                     return;
                 }
@@ -127,7 +162,7 @@ namespace PulseStock___Inventory_Management_System.Classes.Functions
         }
         public bool CheckUser(string username)//checks the username if it is already in the file
         {
-            string[] lines = File.ReadAllLines(filename);
+            string[] lines = File.ReadAllLines(accountListLocation);
             foreach (string line in lines)
             {
                 if (line.Split(',')[0].Equals(username, StringComparison.OrdinalIgnoreCase))
@@ -136,22 +171,6 @@ namespace PulseStock___Inventory_Management_System.Classes.Functions
                 }
             }
             return false;
-        }
-        public string InputNotNull(string prompt, bool password = false)//Custom Line Reader to determine if user input is not null
-        {
-            string? input;
-            do
-            {
-                Console.Write(prompt);
-                input = password ? ReadPassword() : Console.ReadLine();
-                if (string.IsNullOrEmpty(input))
-                {
-                    Console.Write("\nThere was no input, please try again. Press any key to continue.");
-                    Console.ReadKey();
-                    return "error";//Returns a string message after the user inputs an empty string
-                }
-            } while (string.IsNullOrEmpty(input));
-            return input;
         }
         public string ReadPassword()//changing the character inputed by the user to protect password
         {
