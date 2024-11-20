@@ -9,6 +9,7 @@ using Spectre.Console;
 using PulseStock___Inventory_Management_System.Classes.Parent;
 using System.Xml.Linq;
 using System.Net.Http.Headers;
+using System.IO;
 
 namespace PulseStock___Inventory_Management_System.Classes.Functions
 {
@@ -35,7 +36,7 @@ namespace PulseStock___Inventory_Management_System.Classes.Functions
         {
             Prompt = "Inventory Manager";
             string[] options = { " Add Product", " View Product List", " Search for Product", " Modify Product",
-                                " Remove Product", " Transaction and Analytics"," Delete Account"," Log Out"};
+                                " Remove Product", " Transaction and History"," Delete Account"," Log Out"};
             StockMenu stockMenu = new StockMenu(Prompt, options, userStockList);
             bool loop = true;
             
@@ -387,7 +388,7 @@ namespace PulseStock___Inventory_Management_System.Classes.Functions
         {
             Console.Clear();
             Prompt = "Transactions and Analytics";
-            string[] options = { " Make a Transaction", " View Transaction History", " View Analytics", " Exit"};
+            string[] options = { " Make a Transaction", " View Transaction History", " Exit"};
             StockMenu transMenu = new StockMenu(Prompt,options,userSales);
             bool loop = true;
 
@@ -403,9 +404,6 @@ namespace PulseStock___Inventory_Management_System.Classes.Functions
                         ViewTransactons();
                         break;
                     case 2:
-                        ViewAnalytics();
-                        break;
-                    case 3:
                         loop = false;
                         break;
                 }
@@ -523,9 +521,11 @@ namespace PulseStock___Inventory_Management_System.Classes.Functions
             table.AddRow(new Markup($"Date Purchased: [Bold Yellow]{DateTime.Now}[/]"), new Markup(""));
             table.AddRow(new Markup("[Bold Yellow]This is your SALES INVOICE[/]"));
             AnsiConsole.Write(table); 
-            // Save the transaction 
-            string transactionRecord = $"{DateTime.Now},{string.Join('|', transaction.Select(p => $"{p[0]},{p[1]},{p[2]},{p[3]}"))},{total},{money},{change}"; 
+
+            // Save the transaction Date|Product Names| Product Quantities| Total Sales| Cash||Change
+            string transactionRecord = $"{DateTime.Now}|{string.Join(',', transaction.Select(p => $"{p[1]}"))}|{string.Join(',', transaction.Select(p => $"{p[3]}"))}|{total}|{money}|{change}"; 
             File.AppendAllText(userSales, transactionRecord + Environment.NewLine); 
+
             // Update stock list with new quantities
             List<string> updatedStockList = new List<string>
             { 
@@ -557,7 +557,6 @@ namespace PulseStock___Inventory_Management_System.Classes.Functions
             }
 
             // Read the transaction records
-
             // Display transactions in a table
             var table = new Table
             {
@@ -565,24 +564,27 @@ namespace PulseStock___Inventory_Management_System.Classes.Functions
                 ShowRowSeparators = true,
                 Alignment = Justify.Center
             };
+            table.Expand();
             table.Title = new TableTitle("[Bold Yellow]Transaction History[/]");
             table.AddColumn("Date");
             table.AddColumn("Products");
+            table.AddColumn("Quantity");
             table.AddColumn("Total");
             table.AddColumn("Cash");
             table.AddColumn("Change");
+            string date, total, cash, change, product,quantity;
+            string[] products;
 
             foreach (string record in transactionRecords)
             {
-                string[] parts = record.Split(',');
-
-                string date = parts[0];
-                string products = parts[2].Replace('|', '\n'); // Display each product on a new line
-                string total = parts[parts.Length - 3];
-                string cash = parts[parts.Length - 2];
-                string change = parts[parts.Length - 1];
-
-                table.AddRow(date, products, total, cash, change);
+                products = record.Split('|');
+                date = products[0];
+                product = products[1].Replace(',', '\n');
+                quantity = products[2].Replace(',', '\n');
+                total = products[3];
+                cash = products[4];
+                change = products[5];  
+                table.AddRow(date, product,quantity,total, cash, change);
             }
 
             AnsiConsole.Write(table);
@@ -590,17 +592,12 @@ namespace PulseStock___Inventory_Management_System.Classes.Functions
             Console.WriteLine("Press any key to return to the menu.");
             Console.ReadKey();
         }
-        public void ViewAnalytics() 
-        {
-        
-        }
         public void AccountSetting()
         {
             DeleteUser(folder, filename, Username);
             Console.WriteLine("Press any key to continue");
             Console.ReadKey();
         }
-
          public void DeleteUser(string dir, string filename, string username)
         {
             string AccountFileLocation = Path.Combine(dir,filename);
@@ -657,11 +654,6 @@ namespace PulseStock___Inventory_Management_System.Classes.Functions
                 Console.WriteLine($"An error occurred: {ex.Message}");
             }
         }
-
-        // Add search method
-        //When Searching for a product the Cases must be lowered and when the Name or ID is Compared it must also be converted into lower case
-        // So that no problems will occur in the program
-        //List
         public void SearchProduct()
         {
             string Search;
