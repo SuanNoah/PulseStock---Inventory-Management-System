@@ -126,6 +126,7 @@ namespace PulseStock___Inventory_Management_System.Classes.Functions
                     return;
                 }
             } while (!exception);
+            //The exception is returned to false so that it will continue to be used in enter QTY
             exception = false;
             int stockQTY;
             do
@@ -186,7 +187,7 @@ namespace PulseStock___Inventory_Management_System.Classes.Functions
             Console.WriteLine();
             string[] lines = File.ReadAllLines(userStockList);
             string[] check = lines.Skip(1).ToArray();
-            string[] headers = lines[0].Split(',');
+            string[] headers = lines[0].Split(',');//header for the table
             if (check.Length == 0) 
             {
                 Console.Write("File is empty, try adding products. Press any key to return.");
@@ -231,7 +232,7 @@ namespace PulseStock___Inventory_Management_System.Classes.Functions
 
             var productREAD = read.FirstOrDefault(read => read.StartsWith(productId + ","));
 
-            if (read == null)
+            if (productREAD == null)
             {
                 Console.Write("Product not found. Press any key to return.");
                 Console.ReadKey();
@@ -245,8 +246,8 @@ namespace PulseStock___Inventory_Management_System.Classes.Functions
             bool loop = true;
             do 
             {
-                int index = stockMenu.Run();
-                switch (index) 
+                Index = stockMenu.Run();
+                switch (Index) 
                 {
                     case 0:
                     Console.CursorVisible = true;

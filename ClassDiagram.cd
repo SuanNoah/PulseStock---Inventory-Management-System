@@ -1,25 +1,15 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1">
   <Class Name="PulseStock___Inventory_Management_System.Classes.Functions.AccountManager">
-    <Position X="1" Y="3.5" Width="1.5" />
-    <InheritanceLine Type="PulseStock___Inventory_Management_System.Classes.Parent.Data" FixedToPoint="true">
-      <Path>
-        <Point X="4.75" Y="3.401" />
-        <Point X="4.75" Y="3.701" />
-        <Point X="3.5" Y="3.701" />
-        <Point X="3.5" Y="3.2" />
-        <Point X="1.875" Y="3.2" />
-        <Point X="1.875" Y="3.5" />
-      </Path>
-    </InheritanceLine>
+    <Position X="1.5" Y="4.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAABAAAAQAAAAAEEAEAAAAAAAgAABAAAAABAAABAAA=</HashCode>
+      <HashCode>AAAAAAAAAQAAAAAAEAEAAAAAAAgAABAAAAABAAABAAA=</HashCode>
       <FileName>Classes\Functions\AccountManager.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="PulseStock___Inventory_Management_System.Classes.Functions.Home">
-    <Position X="2.75" Y="4" Width="1.5" />
+    <Position X="3.25" Y="4.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAACAAAAEgAAAAAAAAAAAAAAAAIAAAAAEAAAA=</HashCode>
       <FileName>Classes\Functions\Home.cs</FileName>
@@ -27,7 +17,7 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="PulseStock___Inventory_Management_System.Classes.Functions.Menu">
-    <Position X="4.5" Y="4" Width="1.5" />
+    <Position X="5" Y="4.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAI=</HashCode>
       <FileName>Classes\Functions\Menu.cs</FileName>
@@ -35,7 +25,7 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="PulseStock___Inventory_Management_System.Classes.Functions.StockMenu">
-    <Position X="8" Y="3.75" Width="1.5" />
+    <Position X="9.25" Y="3.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAI=</HashCode>
       <FileName>Classes\Functions\StockMenu.cs</FileName>
@@ -43,15 +33,15 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="PulseStock___Inventory_Management_System.Classes.Functions.StocksManagement">
-    <Position X="6.25" Y="3" Width="1.5" />
+    <Position X="7" Y="3" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAKQAAAAAAAAACAAAAAAEAAEAAAAABAAAABBAAAAAAA=</HashCode>
+      <HashCode>AAKQAAAAAAAEACAEAAAAEQAEAAAAAAAAAABBAABAAAA=</HashCode>
       <FileName>Classes\Functions\StocksManagement.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="PulseStock___Inventory_Management_System.App.Program">
-    <Position X="1.75" Y="1" Width="1.5" />
+    <Position X="2" Y="2.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAA=</HashCode>
       <FileName>App\Program.cs</FileName>
@@ -60,35 +50,35 @@
   <Class Name="PulseStock___Inventory_Management_System.Classes.Parent.Data">
     <Position X="4" Y="0.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAEAABAAAAAAIAAAQAAACAAAAAAABACAAEAAABAAAA=</HashCode>
+      <HashCode>AQQEAABAAAAAAAAAAQAAACBAAEAAABACAAEAAABAAAA=</HashCode>
       <FileName>Classes\Parent\Data.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Interface Name="PulseStock___Inventory_Management_System.Classes.Interface.IAccountManipulation">
-    <Position X="8" Y="0.5" Width="1.5" />
+    <Position X="7.5" Y="0.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAABAAAAQAAAAAEEAAAAAAAAAgAABAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAQAAAAAAEAAAAAAAAAgAABAAAAAAAAAAAAA=</HashCode>
       <FileName>Classes\Interface\IAccountManipulation.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Interface Name="PulseStock___Inventory_Management_System.Classes.Interface.IHomeMethods">
-    <Position X="6.25" Y="0.5" Width="1.5" />
+    <Position X="5.75" Y="0.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAACAAAAEAAAAAAAAAAAAAAAAAIAAAAAAAAAA=</HashCode>
       <FileName>Classes\Interface\IHomeMethods.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Interface Name="PulseStock___Inventory_Management_System.Classes.Interface.IMenu">
-    <Position X="9.75" Y="0.5" Width="1.5" />
+    <Position X="9.25" Y="0.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAI=</HashCode>
       <FileName>Classes\Interface\IMenu.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Interface Name="PulseStock___Inventory_Management_System.Classes.Interface.IStocksManipulation">
-    <Position X="11.5" Y="0.5" Width="1.5" />
+    <Position X="11" Y="0.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAKAAAAAAAAAACAAAAAAEAAEAAAAABAAAAABAAAAAAA=</HashCode>
+      <HashCode>AAIAAAAAAAAEACAEAAAAEQAEAAAAAAAAAAABAABAAAA=</HashCode>
       <FileName>Classes\Interface\IStocksManipulation.cs</FileName>
     </TypeIdentifier>
   </Interface>
