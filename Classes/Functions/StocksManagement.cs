@@ -82,28 +82,99 @@ namespace PulseStock___Inventory_Management_System.Classes.Functions
         public void AddStock()
         {
             Console.CursorVisible = true;
+
             Console.Write("Enter Product ID: ");
             string stockID = Console.ReadLine();
-            Console.Write("Enter Product Name: ");
-            string stockName = Console.ReadLine();
-            Console.Write("Enter Product Price: ");
-            string stockPrice = Console.ReadLine();
-            Console.Write("Enter Product Quantity: ");
-            string stockQTY = Console.ReadLine();
-            Console.Write("Enter Product MFG Date(DD/MM/YYYY): ");
-            string stockMFG = Console.ReadLine();
-            Console.Write("Enter Product EXP Date(DD/MM/YYYY): ");
-            string stockEXP = Console.ReadLine();
-            //Check if the input is empty, program must return to menu so that the user can choose again
-            if (string.IsNullOrEmpty(stockID) || string.IsNullOrEmpty(stockName) || string.IsNullOrEmpty(stockPrice) || string.IsNullOrEmpty(stockMFG) || string.IsNullOrEmpty(stockEXP)) 
+            if (string.IsNullOrEmpty(stockID)) 
             {
                 Console.Write("The input must not be empty. Press any key to return.");
                 Console.ReadKey();
                 return;
             }
+            Console.Write("Enter Product Name: ");
+            string stockName = Console.ReadLine();
+            if (string.IsNullOrEmpty(stockName)) 
+            {
+                Console.Write("The input must not be empty. Press any key to return.");
+                Console.ReadKey();
+                return;
+            }
+            bool exception = false;
+            double stockPrice;
+            do
+            {
+                try
+                {
+                    Console.Write("Enter Product Price: ");
+                    stockPrice = double.Parse(Console.ReadLine());
+                    if (stockPrice < 1)
+                    {
+                        Console.Write("Price cannot be less than 1. Press any key to return.");
+                        Console.ReadKey();
+                        exception = true;
+                        return;
+                    }
+                    else if (stockPrice > 0) 
+                    {
+                        exception = true;
+                    }
+                }
+                catch (FormatException)
+                {
+                    Console.Write("Please enter a valid number. Press any key to return");
+                    Console.ReadKey();
+                    return;
+                }
+            } while (!exception);
+            exception = false;
+            int stockQTY;
+            do
+            {
+                try
+                {
+                    Console.Write("Enter Product Quantity: ");
+                    stockQTY = int.Parse(Console.ReadLine());
+                    if (stockQTY < 1)
+                    {
+                        Console.Write("Quantity cannot be less than 1. Press any key to return.");
+                        Console.ReadKey();
+                        exception = true;
+                        return;
+                    }
+                    else if (stockQTY > 0) 
+                    {
+                        exception = true;
+                    }
+                }
+                catch (FormatException)
+                {
+                    Console.Write("Please enter a valid number. Press any key to return");
+                    Console.ReadKey();
+                    return;
+                }
+            } while (!exception);
+            
+            
+            Console.Write("Enter Product MFG Date(DD/MM/YYYY): ");
+            string stockMFG = Console.ReadLine();
+            if ( string.IsNullOrEmpty(stockMFG) || stockMFG.Length < 10 || stockMFG.Length > 10) 
+            {
+                Console.Write("The input must not be empty or cannot be less or more than 10 characters. Press any key to return.");
+                Console.ReadKey();
+                return;
+            }
+            Console.Write("Enter Product EXP Date(DD/MM/YYYY): ");
+            string stockEXP = Console.ReadLine();
+            if ( string.IsNullOrEmpty(stockEXP) || stockEXP.Length < 10 || stockEXP.Length > 10) 
+            {
+                Console.Write("The input must not be empty or cannot be less or more than 10 characters. Press any key to return.");
+                Console.ReadKey();
+                return;
+            }
+            
             using (StreamWriter stockWrite = File.AppendText(userStockList)) 
             {
-                stockWrite.WriteLine($"{stockID},{stockName},{stockPrice},{stockQTY},{stockMFG},{stockEXP}");
+                stockWrite.WriteLine($"{stockID},{stockName},{stockPrice:.00},{stockQTY},{stockMFG},{stockEXP}");
             }
             Console.Write($"{stockID} {stockName} - succesfully added to the database.");
             Console.ReadKey();
@@ -143,6 +214,7 @@ namespace PulseStock___Inventory_Management_System.Classes.Functions
         {
             Console.Clear();
             Console.CursorVisible = true;
+            List<string> read = File.ReadAllLines(userStockList).ToList();
             Table header = new Table();
             header.Border = TableBorder.Square;
             header.Expand();
@@ -157,10 +229,9 @@ namespace PulseStock___Inventory_Management_System.Classes.Functions
             Console.Write("Enter the Product ID: ");
             string productId  = Console.ReadLine()?.Trim();
 
-            List<string> read = File.ReadAllLines(userStockList).ToList();
             var productREAD = read.FirstOrDefault(read => read.StartsWith(productId + ","));
 
-            if (productREAD == null)
+            if (read == null)
             {
                 Console.Write("Product not found. Press any key to return.");
                 Console.ReadKey();
@@ -204,36 +275,63 @@ namespace PulseStock___Inventory_Management_System.Classes.Functions
                     break;
 
                     case 2:
-                    Console.CursorVisible = true;
-                    Console.Write("Enter new Product Price: ");
-                    split[2] = Console.ReadLine()?.Trim();
-                    if (string.IsNullOrEmpty(split[2]))
-                    {
-                        Console.WriteLine("The input must not be empty. Please any key to return.");
-                        Console.ReadLine();
-                        return;
-                    }
-                    loop = false;
-                    break;
-
+                        Console.CursorVisible = true;
+                        try
+                        {
+                            Console.Write("Enter new Product Price: ");
+                            double Price = double.Parse(Console.ReadLine());
+                            if (Price < 1) 
+                            {
+                                Console.Write("Price cannot be less than 1. Press any key to return.");
+                                Console.ReadKey();
+                                return;
+                            }
+                            else if (Price > 0) 
+                            {
+                            split[2] = Price.ToString();
+                            loop = false;
+                            break;                             
+                            }
+                        }
+                        catch (FormatException) 
+                        {
+                            Console.Write("Please enter a valid number. Press any key to return");
+                            Console.ReadKey();
+                            return;
+                        }
+                        break;
                     case 3:
                     Console.CursorVisible = true;
-                    Console.Write("Enter new Product Quantity: ");
-                    split[3] = Console.ReadLine()?.Trim();
-                    if (string.IsNullOrEmpty(split[3]))
-                    {
-                        Console.WriteLine("The input must not be empty. Please any key to return.");
-                        Console.ReadLine();
-                        return;
-                    }
-                    loop = false;
-                    break;
+                        try
+                        {
+                            Console.Write("Enter new Product Price: ");
+                            double Quantity = double.Parse(Console.ReadLine());
+                            if (Quantity < 1) 
+                            {
+                                Console.Write("Quantity cannot be less than 1. Press any key to return.");
+                                Console.ReadKey();
+                                return;
+                            }
+                            else if (Quantity > 0) 
+                            {
+                            split[3] = Quantity.ToString();
+                            loop = false;
+                            break;                             
+                            }
+                        }
+                        catch (FormatException) 
+                        {
+                            Console.Write("Please enter a valid number. Press any key to return");
+                            Console.ReadKey();
+                            return;
+                        }
+                        break;
 
                     case 4:
                     Console.CursorVisible = true;
                     Console.Write("Enter new Product EXP Date(DD/MM/YYYY): ");
                     split[4] = Console.ReadLine()?.Trim();
-                    if (string.IsNullOrEmpty(split[4]))
+                    if (string.IsNullOrEmpty(split[4]) || split[4].Length < 10 || split[4].Length > 10)
                     {
                         Console.WriteLine("The input must not be empty. Please any key to return.");
                         Console.ReadLine();
@@ -246,7 +344,7 @@ namespace PulseStock___Inventory_Management_System.Classes.Functions
                     Console.CursorVisible = true;
                     Console.Write("Enter new Product EXP Date(DD/MM/YYYY): ");
                     split[5] = Console.ReadLine()?.Trim();
-                    if (string.IsNullOrEmpty(split[4]))
+                    if (string.IsNullOrEmpty(split[5]) || split[5].Length < 10 || split[5].Length > 10)
                     {
                         Console.WriteLine("The input must not be empty. Please any key to return.");
                         Console.ReadLine();
@@ -704,7 +802,7 @@ namespace PulseStock___Inventory_Management_System.Classes.Functions
                 foreach (var searched in result)
                 {
                     string[] split = searched.Split(',');
-                    SearchTable.AddRow(split[0], split[1], split[2], split[3], split[4]);
+                    SearchTable.AddRow(split[0], split[1], split[2], split[3], split[4], split[5]);
                 }
                 AnsiConsole.Write(SearchTable);
                 Console.Write("Nothing follows. Press any key to continue.");
