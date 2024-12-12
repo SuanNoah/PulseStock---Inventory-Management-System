@@ -65,7 +65,7 @@ namespace PulseStock___Inventory_Management_System.Classes.Functions
             about.Expand();
             about.AddColumn(new TableColumn(Messages.Messages.aboutMSG).Centered());
             AnsiConsole.Write(about);
-            Console.Write("Press any key to return to home.");
+            Console.Write("Press any key to return to home..");
             Console.ReadKey();
         }
 
